@@ -1,5 +1,7 @@
 const sqlite3 = require('sqlite3');
 
+const { AUTOMATA_SQLITE_FILE } = require('../../config');
+
 const { fromDB, toDB } = require('./utils/type-conversion');
 
 let client;
@@ -200,7 +202,7 @@ const findOne = async (tableName, where) => {
   return get(sql, params);
 };
 
-const initDB = async (initFilename = ':memory:') => {
+const initDB = async (initFilename = AUTOMATA_SQLITE_FILE) => {
   filename = initFilename;
 };
 
