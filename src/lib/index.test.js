@@ -9,6 +9,9 @@ const {
   insertOne,
   replaceOne,
   updateOne,
+  initDB,
+  connectDB,
+  closeDB,
 } = require('.');
 
 const tableName = 'test';
@@ -22,8 +25,16 @@ const columns = [
 const table = { columns, name: tableName };
 
 describe('db test', () => {
-  beforeAll(() => createTable(table));
-  afterAll(() => dropTable(tableName));
+  beforeAll(async () => {
+    await initDB();
+    await connectDB();
+    await createTable(table);
+  });
+
+  afterAll(async () => {
+    await dropTable(tableName);
+    await closeDB();
+  });
 
   afterEach(() => deleteAll(tableName));
 

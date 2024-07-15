@@ -1,6 +1,5 @@
 module.exports = {
-  setupFilesAfterEnv: [
+  setupFiles: [
     './jest/jest.setup.mongodb-memory-server.js',
-    './jest/jest.setup.db.js',
   ],
 };
