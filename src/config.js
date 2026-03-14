@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const {
   AUTOMATA_DB_ENGINE = 'sqlite',
