@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3');
+const Sqlite3 = require('better-sqlite3');
 
 const { AUTOMATA_DB_SQLITE_FILE } = require('../../config');
 
@@ -97,53 +97,66 @@ const setSql = (updates) => {
   return { params, sql };
 };
 
+// Sqlite3 Abs
+
 const all = async (sql, params = []) => (
   new Promise((resolve, reject) => {
-    client.all(sql, params, (err, rows) => {
-      if (err) reject(err);
+    try {
+      const rows = client.prepare(sql).all(...params);
       resolve(rows);
-    });
+    } catch (err) {
+      reject(err);
+    }
   })
 );
 
 const get = async (sql, params = []) => (
   new Promise((resolve, reject) => {
-    client.get(sql, params, (err, row) => {
-      if (err) reject(err);
+    try {
+      const row = client.prepare(sql).get(...params);
       resolve(row || null);
-    });
+    } catch (err) {
+      reject(err);
+    }
   })
 );
 
 const run = async (sql, params = []) => (
   new Promise((resolve, reject) => {
-    // function to receive this
-    client.run(sql, params, function callback(err) {
-      if (err) reject(err);
-      resolve(this);
-    });
+    try {
+      const info = client.prepare(sql).run(...params);
+      resolve(info);
+    } catch (err) {
+      reject(err);
+    }
   })
 );
 
 const closeDB = async () => (
   new Promise((resolve, reject) => {
-    client.close((err) => {
-      if (err) reject(err);
-      else resolve();
-    });
+    try {
+      client.close();
+      resolve(true);
+    } catch (err) {
+      reject(err);
+    }
   })
 );
 
 const connectDB = async () => {
   client = await (
     new Promise((resolve, reject) => {
-      const db = new sqlite3.Database(filename, (err) => {
-        if (err) reject(err);
-        else resolve(db);
-      });
+      try {
+        const db = new Sqlite3(filename);
+        resolve(db);
+      } catch (err) {
+        reject(err);
+      }
     })
   );
 };
+
+// end Sqlite3 Abs
 
 const count = async (tableName, where = {}) => {
   const { sql: wheresql, params } = whereSql(where);
@@ -210,7 +223,6 @@ const insertOne = async (tableName, row) => {
   const { sql: valuessql, params } = valuesSql(row);
 
   const sql = `INSERT INTO "${tableName}" ${valuessql}`;
-
   return run(sql, params);
 };
 
@@ -228,7 +240,7 @@ const updateOne = async (tableName, where, updates) => {
 
 // TODO: deprecate
 const replaceOne = async (tableName, where, newRow) => {
-  const allColums = await all(`SELECT name FROM PRAGMA_TABLE_INFO("${tableName}")`);
+  const allColums = await all(`SELECT name FROM PRAGMA_TABLE_INFO('${tableName}')`);
   const defaults = allColums.reduce((acc, { name }) => ({ ...acc, [name]: null }), {});
   const updates = { ...defaults, ...newRow };
 

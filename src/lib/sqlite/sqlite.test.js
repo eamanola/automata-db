@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3');
+const Sqlite3 = require('better-sqlite3');
 
 const { tableSchema } = require('../validators');
 
@@ -22,11 +22,14 @@ it('is valid table', async () => {
 
 describe('API', () => {
   it('sqlite3 should have used API', async () => {
-    const client = new sqlite3.Database(':memory:');
-    expect(typeof client.run).toBe('function');
-    expect(typeof client.get).toBe('function');
-    expect(typeof client.all).toBe('function');
+    const client = new Sqlite3(':memory:');
+    expect(typeof client.prepare).toBe('function');
     expect(typeof client.close).toBe('function');
+
+    const prepare = client.prepare('SELECT 1');
+    expect(typeof prepare.run).toBe('function');
+    expect(typeof prepare.get).toBe('function');
+    expect(typeof prepare.all).toBe('function');
 
     client.close();
   });
@@ -58,7 +61,7 @@ describe('connection', () => {
       try {
         await createTable(table);
       } catch ({ message }) {
-        expect(/SQLITE_MISUSE: Database is closed/u.test(message)).toBe(true);
+        expect(/The database connection is not open/u.test(message)).toBe(true);
       }
     });
   });
@@ -72,11 +75,11 @@ describe('lastID', () => {
 
     await deleteAll(table.name);
     expect(await count(table.name)).toBe(0);
-    const { lastID: firstId } = await insertOne(table.name, { foo: 1 });
+    const { lastInsertRowid: firstId } = await insertOne(table.name, { foo: 1 });
 
     await deleteAll(table.name);
     expect(await count(table.name)).toBe(0);
-    const { lastID: secondId } = await insertOne(table.name, { foo: 1 });
+    const { lastInsertRowid: secondId } = await insertOne(table.name, { foo: 1 });
 
     expect(firstId).toBeTruthy();
     expect(secondId).toBeTruthy();
