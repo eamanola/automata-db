@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "files": [
@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "build": "webpack",
     "prepack": "npm run build",
-    "prepare": "npm run build"
+    "prepare": "husky || true"
   },
   "keywords": [
     "database",
