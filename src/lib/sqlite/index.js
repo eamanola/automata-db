@@ -4,40 +4,40 @@ const {
   createIndexSql, createSql, setSql, valuesSql, whereSql,
 } = require('./utils/sql-helpers');
 const {
-  all, closeDB, connectDB, get, hasClient, run,
+  all, closeDB, connectDB, get, run,
 } = require('./driver');
 
-const count = async (tableName, where = {}) => {
+const count = async (client, tableName, where = {}) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `SELECT count(*) AS count FROM "${tableName}" ${wheresql}`;
 
-  const { count: cc } = await get(sql, params);
+  const { count: cc } = await get(client, sql, params);
 
   return cc;
 };
 
-const createIndexes = ({ indexes = [], name: tableName }) => Promise.all(
-  indexes.map((index) => run(createIndexSql(tableName, index))),
+const createIndexes = (client, { indexes = [], name: tableName }) => Promise.all(
+  indexes.map((index) => run(client, createIndexSql(tableName, index))),
 );
 
-const createTable = async (table) => {
-  await run(createSql(table));
-  await createIndexes(table);
+const createTable = async (client, table) => {
+  await run(client, createSql(table));
+  await createIndexes(client, table);
 
   // const indexes = await all('SELECT name, tbl_name FROM sqlite_master WHERE type = "index";');
   // console.log(indexes);
 };
 
-const deleteAll = async (tableName, where = {}) => {
+const deleteAll = async (client, tableName, where = {}) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `DELETE FROM "${tableName}" ${wheresql}`;
 
-  return run(sql, params);
+  return run(client, sql, params);
 };
 
-const deleteOne = async (tableName, where) => {
+const deleteOne = async (client, tableName, where) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `
@@ -45,15 +45,16 @@ const deleteOne = async (tableName, where) => {
     SELECT rowid FROM "${tableName}" ${wheresql} LIMIT 1
   )`;
 
-  return run(sql, params);
+  return run(client, sql, params);
 };
 
-const find = async (tableName, where, { limit = -1, offset = -1 }) => {
+const find = async (client, tableName, where, { limit = -1, offset = -1 }) => {
   const { params, sql: wheresql } = whereSql(where);
 
   const sql = `SELECT * FROM "${tableName}" ${wheresql} LIMIT ? OFFSET ?`;
 
   return all(
+    client,
     sql,
     [
       ...params,
@@ -63,27 +64,22 @@ const find = async (tableName, where, { limit = -1, offset = -1 }) => {
   );
 };
 
-const findOne = async (tableName, where) => {
+const findOne = async (client, tableName, where) => {
   const { params, sql: wheresql } = whereSql(where);
 
   const sql = `SELECT * FROM "${tableName}" ${wheresql}`;
 
-  return get(sql, params);
+  return get(client, sql, params);
 };
 
-let filename = '';
-const initDB = async (initFilename = AUTOMATA_DB_SQLITE_FILE) => {
-  filename = initFilename;
-};
-
-const insertOne = async (tableName, row) => {
+const insertOne = async (client, tableName, row) => {
   const { sql: valuessql, params } = valuesSql(row);
 
   const sql = `INSERT INTO "${tableName}" ${valuessql}`;
-  return run(sql, params);
+  return run(client, sql, params);
 };
 
-const updateOne = async (tableName, where, updates) => {
+const updateOne = async (client, tableName, where, updates) => {
   const { sql: wheresql, params: whereParams } = whereSql(where);
   const { sql: setsql, params: setParams } = setSql(updates);
 
@@ -92,23 +88,23 @@ const updateOne = async (tableName, where, updates) => {
     SELECT rowid FROM "${tableName}" ${wheresql} LIMIT 1
   )`;
 
-  return run(sql, [...setParams, ...whereParams]);
+  return run(client, sql, [...setParams, ...whereParams]);
 };
 
 // TODO: deprecate
-const replaceOne = async (tableName, where, newRow) => {
-  const allColums = await all(`SELECT name FROM PRAGMA_TABLE_INFO('${tableName}')`);
+const replaceOne = async (client, tableName, where, newRow) => {
+  const allColums = await all(client, `SELECT name FROM PRAGMA_TABLE_INFO('${tableName}')`);
   const defaults = allColums.reduce((acc, { name }) => ({ ...acc, [name]: null }), {});
   const updates = { ...defaults, ...newRow };
 
-  return updateOne(tableName, where, updates);
+  return updateOne(client, tableName, where, updates);
 };
 
-const dropTable = async (tableName) => run(`DROP TABLE "${tableName}"`);
+const dropTable = async (client, tableName) => run(client, `DROP TABLE "${tableName}"`);
 
 module.exports = {
   closeDB,
-  connectDB: () => connectDB(filename),
+  connectDB: (filename = AUTOMATA_DB_SQLITE_FILE) => connectDB(filename),
   count,
   createTable,
   deleteAll,
@@ -117,8 +113,6 @@ module.exports = {
   find,
   findOne,
   fromDB,
-  hasClient,
-  initDB,
   insertOne,
   replaceOne,
   toDB,

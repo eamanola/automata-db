@@ -6,20 +6,20 @@ if (AUTOMATA_DB_ENGINE === 'mongo' && AUTOMATA_DB_MONGO_URL === ':memory:') {
     const mongo = jest.requireActual('../src/lib/mongo');
     let mongod;
 
-    const initDB = async () => {
+    const connectDB = async () => {
       mongod = await MongoMemoryServer.create();
-      return mongo.initDB(mongod.getUri());
+      return mongo.connectDB(mongod.getUri());
     };
 
-    const closeDB = async () => {
-      await mongo.closeDB();
+    const closeDB = async (client) => {
+      await mongo.closeDB(client);
       await mongod.stop();
     };
 
     return {
       ...mongo,
       closeDB,
-      initDB,
+      connectDB,
     };
   });
 }

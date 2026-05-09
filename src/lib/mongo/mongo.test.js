@@ -1,7 +1,6 @@
 const { MongoClient } = require('mongodb');
 
 const {
-  initDB,
   connectDB,
   closeDB,
   deleteAll,
@@ -32,29 +31,27 @@ if (AUTOMATA_DB_ENGINE === 'mongo') {
   describe('connection', () => {
     describe('connectDB', () => {
       it('should connect', async () => {
-        await initDB();
-        await connectDB();
+        const client = await connectDB();
 
-        await deleteAll('collection');
-        expect(await count('collection')).toBe(0);
-        await insertOne('collection', { foo: 'bar' });
-        expect(await count('collection')).toBe(1);
+        await deleteAll(client, 'collection');
+        expect(await count(client, 'collection')).toBe(0);
+        await insertOne(client, 'collection', { foo: 'bar' });
+        expect(await count(client, 'collection')).toBe(1);
 
-        await closeDB();
+        await closeDB(client);
       });
     });
 
     describe('closeDB', () => {
       it('should disconnect', async () => {
-        await initDB();
-        await connectDB();
+        const client = await connectDB();
 
-        await deleteAll('collection');
-        expect(await count('collection')).toBe(0);
+        await deleteAll(client, 'collection');
+        expect(await count(client, 'collection')).toBe(0);
 
-        await closeDB();
+        await closeDB(client);
 
-        count('collection')
+        count(client, 'collection')
           .catch(({ name }) => expect(name).toMatch('MongoNotConnectedError'));
       });
     });

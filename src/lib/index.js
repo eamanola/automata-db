@@ -18,9 +18,7 @@ const {
   find,
   findOne,
   fromDB,
-  initDB,
   insertOne,
-  hasClient,
   replaceOne,
   toDB,
   updateOne,
@@ -29,41 +27,45 @@ const {
 const callbacks = [];
 
 module.exports = {
-  closeDB: async () => closeDB(),
+  closeDB: async (client) => closeDB(client),
   connectDB: async () => {
-    await connectDB();
+    const client = await connectDB();
     await Promise.all(callbacks.map((callback) => callback()));
 
     callbacks.length = 0;
+    return client;
   },
-  count: (tableName, where = {}) => count(tableName, where),
-  createTable: async (table) => {
+  count: (client, tableName, where = {}) => count(client, tableName, where),
+  createTable: async (client, table) => {
     await tableSchema.validate(table);
 
-    if (hasClient()) {
-      await createTable(table);
-    } else {
-      callbacks.push(() => createTable(table));
-    }
+    await createTable(client, table);
+    // let it throw, and handle
+    // if (hasClient()) {
+    //   await createTable(client, table);
+    // } else {
+    //   callbacks.push(() => createTable(client, table));
+    // }
   },
-  deleteAll: (tableName, where = {}) => deleteAll(tableName, where),
-  deleteOne: async (tableName, where = {}) => deleteOne(tableName, where),
-  dropTable: (tableName) => dropTable(tableName),
-  find: async (tableName, where = {}, { limit, offset } = {}) => (
-    find(tableName, where, {
+  deleteAll: (client, tableName, where = {}) => deleteAll(client, tableName, where),
+  deleteOne: async (client, tableName, where = {}) => deleteOne(client, tableName, where),
+  dropTable: (client, tableName) => dropTable(client, tableName),
+  find: async (client, tableName, where = {}, { limit, offset } = {}) => (
+    find(client, tableName, where, {
       limit: /^\d+$/u.test(limit) ? limit : undefined,
       offset: /^\d+$/u.test(offset) ? offset : undefined,
     })
   ),
-  findOne: async (tableName, where) => findOne(tableName, where),
+  findOne: async (client, tableName, where) => findOne(client, tableName, where),
   fromDB: (row, columns) => fromDB(row, columns),
-  initDB: async (...args) => initDB(...args),
-  insertOne: async (tableName, row) => insertOne(tableName, row),
+  insertOne: async (client, tableName, row) => insertOne(client, tableName, row),
   // TODO deprecate, use update instead;
-  replaceOne: async (tableName, where, newRow) => replaceOne(tableName, where, newRow),
+  replaceOne: async (client, tableName, where, newRow) => (
+    replaceOne(client, tableName, where, newRow)
+  ),
   toDB: (obj) => toDB(obj),
-  updateOne: async (tableName, where, updates, options = {}) => (
-    updateOne(tableName, where, updates, options)
+  updateOne: async (client, tableName, where, updates, options = {}) => (
+    updateOne(client, tableName, where, updates, options)
   ),
   yupFromTable,
 };
