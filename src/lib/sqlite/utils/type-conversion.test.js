@@ -1,5 +1,4 @@
 const { validTableSchema } = require('../../../../jest/test-helpers');
-
 const { toDB, fromDB } = require('./type-conversion');
 
 describe('sqlite type conversion', () => {

@@ -8,8 +8,12 @@ const validTableSchema = () => ({
     { name: 'string', type: 'string' },
   ],
   indexes: [
-    { columns: ['bool', 'required'], name: 'bool-required', unique: true },
-    { columns: ['required'], name: 'required', unique: true },
+    {
+      columns: ['bool', 'required'], name: 'bool-required', unique: true,
+    },
+    {
+      columns: ['required'], name: 'required', unique: true,
+    },
   ],
   name: 'table-name',
 });

@@ -1,5 +1,4 @@
 const { validTableSchema } = require('../../../jest/test-helpers');
-
 const yupFromTable = require('./yup-from-table');
 
 const valid = {

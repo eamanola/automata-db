@@ -1,7 +1,6 @@
 const { AUTOMATA_DB_ENGINE } = require('../config');
 const { tableSchema } = require('./validators');
 const yupFromTable = require('./utils/yup-from-table');
-
 // for production: hardcode to reduce build size & deps
 const mongo = require('./mongo');
 const sqlite = require('./sqlite');

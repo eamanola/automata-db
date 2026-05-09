@@ -1,5 +1,4 @@
 const { AUTOMATA_DB_SQLITE_FILE } = require('../../config');
-
 const { fromDB, toDB } = require('./utils/type-conversion');
 const {
   createIndexSql, createSql, setSql, valuesSql, whereSql,
@@ -54,7 +53,14 @@ const find = async (tableName, where, { limit = -1, offset = -1 }) => {
 
   const sql = `SELECT * FROM "${tableName}" ${wheresql} LIMIT ? OFFSET ?`;
 
-  return all(sql, [...params, limit, offset]);
+  return all(
+    sql,
+    [
+      ...params,
+      limit,
+      offset,
+    ],
+  );
 };
 
 const findOne = async (tableName, where) => {

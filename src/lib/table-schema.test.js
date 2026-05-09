@@ -1,7 +1,5 @@
 const { validTableSchema } = require('../../jest/test-helpers');
-
 const { supportedTypes: supportedSqliteTypes } = require('./sqlite/utils/type-conversion');
-
 const { tableSchema } = require('./validators');
 
 describe('table schema', () => {
@@ -16,7 +14,7 @@ describe('table schema', () => {
     try {
       await tableSchema.validate({ ...rest });
       expect(true).toBe(false);
-    } catch (err) {
+    } catch {
       expect(true).toBe(true);
     }
   });
@@ -27,28 +25,28 @@ describe('table schema', () => {
     try {
       await tableSchema.validate({ ...rest });
       expect(true).toBe(false);
-    } catch (err) {
+    } catch {
       expect(true).toBe(true);
     }
 
     try {
       await tableSchema.validate({ ...rest, columns: [] });
       expect(true).toBe(false);
-    } catch (err) {
+    } catch {
       expect(true).toBe(true);
     }
 
     try {
       await tableSchema.validate({ ...rest, columns: { foo: 1 } });
       expect(true).toBe(false);
-    } catch (err) {
+    } catch {
       expect(true).toBe(true);
     }
 
     try {
       await tableSchema.validate({ ...rest, columns: null });
       expect(true).toBe(false);
-    } catch (err) {
+    } catch {
       expect(true).toBe(true);
     }
   });
@@ -61,7 +59,7 @@ describe('table schema', () => {
       try {
         await tableSchema.validate({ ...rest, columns: [{ ...restOfColumn }] });
         expect(true).toBe(false);
-      } catch (err) {
+      } catch {
         expect(true).toBe(true);
       }
     });
@@ -79,7 +77,7 @@ describe('table schema', () => {
       try {
         await tableSchema.validate({ ...rest, columns: [{ ...restOfColumn, type: unsupported }] });
         expect(true).toBe(false);
-      } catch (err) {
+      } catch {
         expect(true).toBe(true);
       }
     });
