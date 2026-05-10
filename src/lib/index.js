@@ -26,10 +26,12 @@ const {
 
 const callbacks = [];
 
+let connected = false;
 module.exports = {
   closeDB: async (client) => closeDB(client),
-  connectDB: async () => {
-    const client = await connectDB();
+  connectDB: async (url) => {
+    const client = await connectDB(url);
+    connected = true;
     await Promise.all(callbacks.map((callback) => callback()));
 
     callbacks.length = 0;
@@ -37,6 +39,7 @@ module.exports = {
   },
   count: (client, tableName, where = {}) => count(client, tableName, where),
   createTable: async (client, table) => {
+    if (!connected) throw new Error('put callbacks back here');
     await tableSchema.validate(table);
 
     await createTable(client, table);

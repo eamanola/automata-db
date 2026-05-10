@@ -1,11 +1,11 @@
 {
   "name": "automata-db",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
   "files": [
-    "./dist/index.bundle.js"
+    "dist/index.bundle.js"
   ],
   "scripts": {
     "test": "AUTOMATA_DB_ENGINE=mongo jest; AUTOMATA_DB_ENGINE=sqlite jest;",
