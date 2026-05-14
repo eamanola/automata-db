@@ -1,5 +1,5 @@
 const { validTableSchema } = require('../../jest/test-helpers');
-const { supportedTypes: supportedSqliteTypes } = require('./sqlite/utils/type-conversion');
+const { supportedTypes: supportedSqliteTypes } = require('./drivers/sqlite/utils/type-conversion');
 const { tableSchema } = require('./validators');
 
 describe('table schema', () => {

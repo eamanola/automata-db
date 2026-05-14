@@ -1,5 +1,7 @@
+const { drivers } = require('.');
+
 ['sqlite', 'mongo'].forEach((DB_ENGINE) => {
-  const db = require('.')({ DB_ENGINE });
+  const db = drivers({ DB_ENGINE });
 
   const tableName = 'test';
 

@@ -6,7 +6,7 @@ const {
   string,
 } = require('yup');
 
-const { supportedTypes: supportedSqliteTypes } = require('./sqlite/utils/type-conversion');
+const { supportedTypes: supportedSqliteTypes } = require('./drivers/sqlite/utils/type-conversion');
 
 const columnSchema = object().shape({
   default: mixed(),

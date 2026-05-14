@@ -1,6 +1,6 @@
 const Sqlite3 = require('better-sqlite3');
 
-const { tableSchema } = require('../validators');
+const { tableSchema } = require('../../validators');
 const {
   connectDB,
   closeDB,

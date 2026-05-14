@@ -1,6 +1,6 @@
-jest.mock('../src/lib/mongo', () => {
+jest.mock('../src/lib/drivers/mongo', () => {
   const { MongoMemoryServer } = jest.requireActual('mongodb-memory-server');
-  const mongo = jest.requireActual('../src/lib/mongo');
+  const mongo = jest.requireActual('../src/lib/drivers/mongo');
   let mongod = null;
 
   const connectDB = async (url) => {

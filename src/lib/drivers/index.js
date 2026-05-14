@@ -1,0 +1,53 @@
+const { tableSchema } = require('../validators');
+
+module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
+  let driver;
+  switch (DB_ENGINE.toLowerCase()) {
+    case 'mongo':
+      driver = require('./mongo');
+      break;
+
+    case 'sqlite':
+      driver = require('./sqlite');
+      break;
+
+    default:
+      throw new Error('DB_ENGINE should be one of: mongo, sqlite (default)');
+  }
+
+  return {
+    client: null,
+    closeDB: async () => driver.closeDB(this.client),
+    connectDB: async (url) => {
+      this.client = await driver.connectDB(url);
+
+      return this.client;
+    },
+    count: (tableName, where = {}) => driver.count(this.client, tableName, where),
+    createTable: async (table) => {
+      await tableSchema.validate(table);
+
+      await driver.createTable(this.client, table);
+    },
+    deleteAll: (tableName, where = {}) => driver.deleteAll(this.client, tableName, where),
+    deleteOne: async (tableName, where = {}) => driver.deleteOne(this.client, tableName, where),
+    dropTable: (tableName) => driver.dropTable(this.client, tableName),
+    find: async (tableName, where = {}, { limit, offset } = {}) => (
+      driver.find(this.client, tableName, where, {
+        limit: /^\d+$/u.test(limit) ? limit : undefined,
+        offset: /^\d+$/u.test(offset) ? offset : undefined,
+      })
+    ),
+    findOne: async (tableName, where) => driver.findOne(this.client, tableName, where),
+    fromDB: (row, columns) => driver.fromDB(row, columns),
+    insertOne: async (tableName, row) => driver.insertOne(this.client, tableName, row),
+    // TODO deprecate, use update instead;
+    replaceOne: async (tableName, where, newRow) => (
+      driver.replaceOne(this.client, tableName, where, newRow)
+    ),
+    toDB: (obj) => driver.toDB(obj),
+    updateOne: async (tableName, where, updates, options = {}) => (
+      driver.updateOne(this.client, tableName, where, updates, options)
+    ),
+  };
+};
