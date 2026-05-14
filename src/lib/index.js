@@ -1,15 +1,17 @@
 const { tableSchema } = require('./validators');
 const yupFromTable = require('./utils/yup-from-table');
+const mongo = require('./mongo');
+const sqlite = require('./sqlite');
 
 module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
   let driver;
-  switch ((DB_ENGINE || '').toLowerCase()) {
+  switch (DB_ENGINE.toLowerCase()) {
     case 'mongo':
-      driver = require('./mongo');
+      driver = mongo;
       break;
 
     case 'sqlite':
-      driver = require('./sqlite');
+      driver = sqlite;
       break;
 
     default:
