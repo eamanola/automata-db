@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
@@ -8,7 +8,7 @@
     "dist/index.bundle.js"
   ],
   "scripts": {
-    "test": "AUTOMATA_DB_ENGINE=mongo jest; AUTOMATA_DB_ENGINE=sqlite jest;",
+    "test": "jest",
     "lint": "eslint .",
     "build": "webpack",
     "prepack": "npm run build",

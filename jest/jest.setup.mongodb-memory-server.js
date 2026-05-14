@@ -1,6 +1,6 @@
-const { AUTOMATA_DB_ENGINE, AUTOMATA_DB_MONGO_URL } = require('../src/config');
+const { AUTOMATA_DB_MONGO_URL } = require('../src/config');
 
-if (AUTOMATA_DB_ENGINE === 'mongo' && AUTOMATA_DB_MONGO_URL === ':memory:') {
+if (AUTOMATA_DB_MONGO_URL === ':memory:') {
   jest.mock('../src/lib/mongo', () => {
     const { MongoMemoryServer } = jest.requireActual('mongodb-memory-server');
     const mongo = jest.requireActual('../src/lib/mongo');

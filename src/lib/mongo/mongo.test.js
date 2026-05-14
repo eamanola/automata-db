@@ -7,7 +7,6 @@ const {
   count,
   insertOne,
 } = require('.');
-const { AUTOMATA_DB_ENGINE } = require('../../config');
 
 describe('API', () => {
   it('MongoClient should have used API', async () => {
@@ -27,33 +26,31 @@ describe('API', () => {
   });
 });
 
-if (AUTOMATA_DB_ENGINE === 'mongo') {
-  describe('connection', () => {
-    describe('connectDB', () => {
-      it('should connect', async () => {
-        const client = await connectDB();
+describe('connection', () => {
+  describe('connectDB', () => {
+    it('should connect', async () => {
+      const client = await connectDB();
 
-        await deleteAll(client, 'collection');
-        expect(await count(client, 'collection')).toBe(0);
-        await insertOne(client, 'collection', { foo: 'bar' });
-        expect(await count(client, 'collection')).toBe(1);
+      await deleteAll(client, 'collection');
+      expect(await count(client, 'collection')).toBe(0);
+      await insertOne(client, 'collection', { foo: 'bar' });
+      expect(await count(client, 'collection')).toBe(1);
 
-        await closeDB(client);
-      });
-    });
-
-    describe('closeDB', () => {
-      it('should disconnect', async () => {
-        const client = await connectDB();
-
-        await deleteAll(client, 'collection');
-        expect(await count(client, 'collection')).toBe(0);
-
-        await closeDB(client);
-
-        count(client, 'collection')
-          .catch(({ name }) => expect(name).toMatch('MongoNotConnectedError'));
-      });
+      await closeDB(client);
     });
   });
-}
+
+  describe('closeDB', () => {
+    it('should disconnect', async () => {
+      const client = await connectDB();
+
+      await deleteAll(client, 'collection');
+      expect(await count(client, 'collection')).toBe(0);
+
+      await closeDB(client);
+
+      count(client, 'collection')
+        .catch(({ name }) => expect(name).toMatch('MongoNotConnectedError'));
+    });
+  });
+});
