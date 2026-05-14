@@ -34,37 +34,38 @@ module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
   } = driver;
 
   return {
-    closeDB: async (client) => closeDB(client),
+    client: null,
+    closeDB: async () => closeDB(this.client),
     connectDB: async (url) => {
-      const client = await connectDB(url);
+      this.client = await connectDB(url);
 
-      return client;
+      return this.client;
     },
-    count: (client, tableName, where = {}) => count(client, tableName, where),
-    createTable: async (client, table) => {
+    count: (tableName, where = {}) => count(this.client, tableName, where),
+    createTable: async (table) => {
       await tableSchema.validate(table);
 
-      await createTable(client, table);
+      await createTable(this.client, table);
     },
-    deleteAll: (client, tableName, where = {}) => deleteAll(client, tableName, where),
-    deleteOne: async (client, tableName, where = {}) => deleteOne(client, tableName, where),
-    dropTable: (client, tableName) => dropTable(client, tableName),
-    find: async (client, tableName, where = {}, { limit, offset } = {}) => (
-      find(client, tableName, where, {
+    deleteAll: (tableName, where = {}) => deleteAll(this.client, tableName, where),
+    deleteOne: async (tableName, where = {}) => deleteOne(this.client, tableName, where),
+    dropTable: (tableName) => dropTable(this.client, tableName),
+    find: async (tableName, where = {}, { limit, offset } = {}) => (
+      find(this.client, tableName, where, {
         limit: /^\d+$/u.test(limit) ? limit : undefined,
         offset: /^\d+$/u.test(offset) ? offset : undefined,
       })
     ),
-    findOne: async (client, tableName, where) => findOne(client, tableName, where),
+    findOne: async (tableName, where) => findOne(this.client, tableName, where),
     fromDB: (row, columns) => fromDB(row, columns),
-    insertOne: async (client, tableName, row) => insertOne(client, tableName, row),
+    insertOne: async (tableName, row) => insertOne(this.client, tableName, row),
     // TODO deprecate, use update instead;
-    replaceOne: async (client, tableName, where, newRow) => (
-      replaceOne(client, tableName, where, newRow)
+    replaceOne: async (tableName, where, newRow) => (
+      replaceOne(this.client, tableName, where, newRow)
     ),
     toDB: (obj) => toDB(obj),
-    updateOne: async (client, tableName, where, updates, options = {}) => (
-      updateOne(client, tableName, where, updates, options)
+    updateOne: async (tableName, where, updates, options = {}) => (
+      updateOne(this.client, tableName, where, updates, options)
     ),
     yupFromTable,
   };
