@@ -28,7 +28,7 @@
 
   describe('db test', () => {
     beforeAll(async () => {
-      client = await connectDB();
+      client = await connectDB(':memory:');
       await createTable(client, table);
     });
 

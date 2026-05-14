@@ -1,25 +1,28 @@
-const { AUTOMATA_DB_MONGO_URL } = require('../src/config');
+jest.mock('../src/lib/mongo', () => {
+  const { MongoMemoryServer } = jest.requireActual('mongodb-memory-server');
+  const mongo = jest.requireActual('../src/lib/mongo');
+  let mongod = null;
 
-if (AUTOMATA_DB_MONGO_URL === ':memory:') {
-  jest.mock('../src/lib/mongo', () => {
-    const { MongoMemoryServer } = jest.requireActual('mongodb-memory-server');
-    const mongo = jest.requireActual('../src/lib/mongo');
-    let mongod;
-
-    const connectDB = async () => {
+  const connectDB = async (url) => {
+    if (url === ':memory:') {
       mongod = await MongoMemoryServer.create();
       return mongo.connectDB(mongod.getUri());
-    };
+    }
 
-    const closeDB = async (client) => {
-      await mongo.closeDB(client);
+    return mongo.connectDB(url);
+  };
+
+  const closeDB = async (client) => {
+    await mongo.closeDB(client);
+
+    if (mongod) {
       await mongod.stop();
-    };
+    }
+  };
 
-    return {
-      ...mongo,
-      closeDB,
-      connectDB,
-    };
-  });
-}
+  return {
+    ...mongo,
+    closeDB,
+    connectDB,
+  };
+});

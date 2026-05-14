@@ -29,7 +29,7 @@ describe('API', () => {
 describe('connection', () => {
   describe('connectDB', () => {
     it('should connect', async () => {
-      const client = await connectDB();
+      const client = await connectDB(':memory:');
 
       await deleteAll(client, 'collection');
       expect(await count(client, 'collection')).toBe(0);
@@ -42,7 +42,7 @@ describe('connection', () => {
 
   describe('closeDB', () => {
     it('should disconnect', async () => {
-      const client = await connectDB();
+      const client = await connectDB(':memory:');
 
       await deleteAll(client, 'collection');
       expect(await count(client, 'collection')).toBe(0);
