@@ -1,4 +1,3 @@
-const { AUTOMATA_DB_SQLITE_FILE } = require('../../config');
 const { fromDB, toDB } = require('./utils/type-conversion');
 const {
   createIndexSql, createSql, setSql, valuesSql, whereSql,
@@ -104,7 +103,7 @@ const dropTable = async (client, tableName) => run(client, `DROP TABLE "${tableN
 
 module.exports = {
   closeDB,
-  connectDB: (filename = AUTOMATA_DB_SQLITE_FILE) => connectDB(filename),
+  connectDB: (filename) => connectDB(filename),
   count,
   createTable,
   deleteAll,

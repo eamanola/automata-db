@@ -1,7 +1,5 @@
 const { MongoClient } = require('mongodb');
 
-const { AUTOMATA_DB_MONGO_URL } = require('../../config');
-
 const copyDoc = (doc) => {
   if (!doc) return doc;
 
@@ -15,7 +13,7 @@ const removeMongoId = (doc) => {
   return { ...rest };
 };
 
-const connectDB = (url = AUTOMATA_DB_MONGO_URL) => {
+const connectDB = (url) => {
   const client = new MongoClient(url);
   return client;
 };
