@@ -36,7 +36,7 @@ describe('API', () => {
 describe('connection', () => {
   describe('connectDB', () => {
     it('should connect', async () => {
-      const client = await connectDB(':memory:');
+      const { client } = await connectDB(':memory:');
 
       await createTable(client, table);
       await dropTable(client, table.name);
@@ -47,7 +47,7 @@ describe('connection', () => {
 
   describe('closeDB', () => {
     it('should disconnect', async () => {
-      const client = await connectDB(':memory:');
+      const { client } = await connectDB(':memory:');
 
       await createTable(client, table);
       await dropTable(client, table.name);
@@ -65,7 +65,7 @@ describe('connection', () => {
 
 describe('lastID', () => {
   it('is not unique', async () => {
-    const client = await connectDB(':memory:');
+    const { client } = await connectDB(':memory:');
     await createTable(client, table);
 
     await deleteAll(client, table.name);

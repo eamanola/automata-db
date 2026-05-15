@@ -17,9 +17,12 @@ module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
 
   return {
     client: null,
-    closeDB: async () => driver.closeDB(this.client),
+    closeDB: async () => driver.closeDB(this.client, this.state),
     connectDB: async (url) => {
-      this.client = await driver.connectDB(url);
+      const { client, state } = await driver.connectDB(url);
+
+      this.client = client;
+      this.state = state;
 
       return this.client;
     },
@@ -45,6 +48,7 @@ module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
     replaceOne: async (tableName, where, newRow) => (
       driver.replaceOne(this.client, tableName, where, newRow)
     ),
+    state: null,
     toDB: (obj) => driver.toDB(obj),
     updateOne: async (tableName, where, updates, options = {}) => (
       driver.updateOne(this.client, tableName, where, updates, options)

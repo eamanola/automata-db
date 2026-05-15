@@ -29,25 +29,25 @@ describe('API', () => {
 describe('connection', () => {
   describe('connectDB', () => {
     it('should connect', async () => {
-      const client = await connectDB(':memory:');
+      const { client, state } = await connectDB(':memory:');
 
       await deleteAll(client, 'collection');
       expect(await count(client, 'collection')).toBe(0);
       await insertOne(client, 'collection', { foo: 'bar' });
       expect(await count(client, 'collection')).toBe(1);
 
-      await closeDB(client);
+      await closeDB(client, state);
     });
   });
 
   describe('closeDB', () => {
     it('should disconnect', async () => {
-      const client = await connectDB(':memory:');
+      const { client, state } = await connectDB(':memory:');
 
       await deleteAll(client, 'collection');
       expect(await count(client, 'collection')).toBe(0);
 
-      await closeDB(client);
+      await closeDB(client, state);
 
       count(client, 'collection')
         .catch(({ name }) => expect(name).toMatch('MongoNotConnectedError'));

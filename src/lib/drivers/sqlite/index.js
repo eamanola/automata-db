@@ -103,7 +103,7 @@ const dropTable = async (client, tableName) => run(client, `DROP TABLE "${tableN
 
 module.exports = {
   closeDB,
-  connectDB: (filename) => connectDB(filename),
+  connectDB,
   count,
   createTable,
   deleteAll,

@@ -4,7 +4,7 @@ const Sqlite3 = require('better-sqlite3');
 const connectDB = async (filename) => {
   const client = new Sqlite3(filename);
 
-  return client;
+  return { client };
 };
 
 const all = (client, sql, params = []) => {

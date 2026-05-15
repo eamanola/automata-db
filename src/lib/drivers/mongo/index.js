@@ -13,9 +13,25 @@ const removeMongoId = (doc) => {
   return { ...rest };
 };
 
-const connectDB = (url) => {
-  const client = new MongoClient(url);
-  return client;
+const closeDB = async (client, { mongod }) => {
+  // mongodb-memory-server
+  if (mongod) { await mongod.stop(); }
+
+  return client.close();
+};
+
+const connectDB = async (url) => {
+  let uri = url;
+  let mongod = null;
+
+  if (uri === ':memory:') {
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    mongod = await MongoMemoryServer.create();
+    uri = mongod.getUri();
+  }
+
+  const client = new MongoClient(uri);
+  return { client, state: { mongod } };
 };
 
 const findOne = async (client, collection, filter) => removeMongoId(
@@ -72,7 +88,7 @@ const createTable = () => null;
 // https://mongodb.github.io/node-mongodb-native/6.8/classes/Db.html#dropCollection
 const dropTable = () => null;
 module.exports = {
-  closeDB: (client) => client.close(),
+  closeDB,
   connectDB,
   count,
   createTable,
