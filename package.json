@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
@@ -31,13 +31,26 @@
     "eslint-stylistic-airbnb": "^3.1.1",
     "globals": "^17.6.0",
     "husky": "^9.1.7",
-    "jest": "^30.4.2",
-    "mongodb-memory-server": "^11.1.0"
+    "jest": "^30.4.2"
   },
   "dependencies": {
-    "better-sqlite3": "^12.10.0",
     "dotenv": "^17.4.2",
-    "mongodb": "^7.2.0",
     "yup": "^1.7.1"
+  },
+  "peerDependencies": {
+    "better-sqlite3": "^12.10.0",
+    "mongodb": "^7.2.0",
+    "mongodb-memory-server": "^11.1.0"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    },
+    "mongodb": {
+      "optional": true
+    },
+    "mongodb-memory-server": {
+      "optional": true
+    }
   }
 }
