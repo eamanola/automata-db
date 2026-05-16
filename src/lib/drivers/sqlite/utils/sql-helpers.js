@@ -4,6 +4,8 @@
 // https://www.sqlitetutorial.net/sqlite-check-constraint/
 // https://www.sqlitetutorial.net/sqlite-primary-key/
 // https://www.sqlitetutorial.net/sqlite-index/
+const validateName = require('./valid-name');
+
 const mapType = (type) => {
   let mapped;
   switch (type) {
@@ -33,7 +35,7 @@ const mapType = (type) => {
 
 const createSql = ({ columns, name: tableName }) => {
   const sql = `
-  CREATE TABLE IF NOT EXISTS "${tableName}" (
+  CREATE TABLE IF NOT EXISTS "${validateName(tableName)}" (
   ${columns.map(({
     name,
     type,
@@ -42,10 +44,10 @@ const createSql = ({ columns, name: tableName }) => {
     unique = false,
   }) => (
     `
-    ${name}
+    ${validateName(name)}
     ${mapType(type)}
     ${required === true ? 'NOT NULL' : ''}
-    ${(defaultValue !== null) ? `DEFAULT ${defaultValue}` : ''}
+    ${(defaultValue !== null) ? `DEFAULT ${validateName(defaultValue)}` : ''}
     ${unique === true ? 'UNIQUE' : ''}`
   )).join(',')}
   )`;
@@ -54,15 +56,16 @@ const createSql = ({ columns, name: tableName }) => {
 };
 
 const createIndexSql = (tableName, { columns, name, unique }) => (
-  `CREATE ${unique ? 'UNIQUE' : ''} INDEX IF NOT EXISTS "${name}"
-  ON "${tableName}" (${columns.join(', ')});`
+  `CREATE ${unique ? 'UNIQUE' : ''} INDEX IF NOT EXISTS "${validateName(name)}"
+  ON "${validateName(tableName)}"
+  (${columns.map((columnName) => validateName(columnName)).join(', ')});`
 );
 
 const whereSql = (where) => {
   const params = Object.values(where);
 
   const sql = params.length
-    ? `WHERE ${Object.keys(where).map((key) => `${key} = ?`).join(' AND ')}`
+    ? `WHERE ${Object.keys(where).map((key) => `${validateName(key)} = ?`).join(' AND ')}`
     : '';
 
   return { params, sql };
@@ -72,7 +75,7 @@ const valuesSql = (row) => {
   const params = Object.values(row);
 
   const sql = params.length
-    ? `(${Object.keys(row).join(', ')}) VALUES (${params.map(() => '?').join(', ')})`
+    ? `(${Object.keys(row).map((key) => validateName(key)).join(', ')}) VALUES (${params.map(() => '?').join(', ')})`
     : '';
 
   return { params, sql };
@@ -82,7 +85,7 @@ const setSql = (updates) => {
   const params = Object.values(updates);
 
   const sql = params.length
-    ? `SET ${Object.keys(updates).map((key) => `${key} = ? `).join(', ')}`
+    ? `SET ${Object.keys(updates).map((key) => `${validateName(key)} = ? `).join(', ')}`
     : '';
 
   return { params, sql };
