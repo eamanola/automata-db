@@ -88,7 +88,7 @@ const updateOne = (client, tableName, where, updates) => {
   const sql = `
   UPDATE "${validateName(tableName)}" ${setsql} WHERE rowid = (
     SELECT rowid FROM "${validateName(tableName)}" ${wheresql} LIMIT 1
-  )`;
+  ) LIMIT 1`;
 
   return run(client, sql, [...setParams, ...whereParams]);
 };
