@@ -276,3 +276,38 @@ const { drivers } = require('.');
     });
   });
 });
+
+// describe('update mant', () => {
+//   it('it should update or create many', async () => {
+//     const { client } = await connectDB(':memory:');
+//     await createTable(client, table);
+//     await deleteAll(client, table.name);
+//     expect(await count(client, table.name)).toBe(0);
+
+//     const obj1 = { foo: '1' };
+//     const obj2 = { foo: '2' };
+//     await insertOne(client, table.name, obj1);
+//     await insertOne(client, table.name, obj2);
+//     expect(await count(client, table.name)).toBe(2);
+
+//     const update1 = { ...obj1, foo: '11' };
+//     const update2 = { ...obj1, foo: '22' };
+
+//     await updateMany(
+//       client,
+//       table.name,
+//       [obj1, obj2],
+//       [update1, update2],
+//     );
+//     expect(await count(client, table.name)).toBe(2);
+
+//     const inDB1 = await findOne(client, table.name, update1);
+//     const inDB2 = await findOne(client, table.name, update2);
+
+//     console.log(update1, inDB1);
+//     console.log(update2, inDB2);
+
+//     await dropTable(client, table.name);
+//     await closeDB(client);
+//   });
+// });

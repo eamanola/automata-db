@@ -7,12 +7,12 @@ const {
 } = require('./driver');
 const validateName = require('./utils/valid-name');
 
-const count = async (client, tableName, where = {}) => {
+const count = (client, tableName, where = {}) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `SELECT count(*) AS count FROM "${validateName(tableName)}" ${wheresql}`;
 
-  const { count: cc } = await get(client, sql, params);
+  const { count: cc } = get(client, sql, params);
 
   return cc;
 };
@@ -21,15 +21,15 @@ const createIndexes = (client, { indexes = [], name: tableName }) => Promise.all
   indexes.map((index) => run(client, createIndexSql(tableName, index))),
 );
 
-const createTable = async (client, table) => {
-  await run(client, createSql(table));
-  await createIndexes(client, table);
+const createTable = (client, table) => {
+  run(client, createSql(table));
+  createIndexes(client, table);
 
-  // const indexes = await all('SELECT name, tbl_name FROM sqlite_master WHERE type = "index";');
+  // const indexes = all('SELECT name, tbl_name FROM sqlite_master WHERE type = "index";');
   // console.log(indexes);
 };
 
-const deleteAll = async (client, tableName, where = {}) => {
+const deleteAll = (client, tableName, where = {}) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `DELETE FROM "${validateName(tableName)}" ${wheresql}`;
@@ -37,7 +37,7 @@ const deleteAll = async (client, tableName, where = {}) => {
   return run(client, sql, params);
 };
 
-const deleteOne = async (client, tableName, where) => {
+const deleteOne = (client, tableName, where) => {
   const { sql: wheresql, params } = whereSql(where);
 
   const sql = `
@@ -48,9 +48,9 @@ const deleteOne = async (client, tableName, where) => {
   return run(client, sql, params);
 };
 
-const dropTable = async (client, tableName) => run(client, `DROP TABLE "${validateName(tableName)}"`);
+const dropTable = (client, tableName) => run(client, `DROP TABLE "${validateName(tableName)}"`);
 
-const find = async (client, tableName, where, { limit = -1, offset = -1 }) => {
+const find = (client, tableName, where, { limit = -1, offset = -1 }) => {
   const { params, sql: wheresql } = whereSql(where);
 
   const sql = `SELECT * FROM "${validateName(tableName)}" ${wheresql} LIMIT ? OFFSET ?`;
@@ -66,7 +66,7 @@ const find = async (client, tableName, where, { limit = -1, offset = -1 }) => {
   );
 };
 
-const findOne = async (client, tableName, where) => {
+const findOne = (client, tableName, where) => {
   const { params, sql: wheresql } = whereSql(where);
 
   const sql = `SELECT * FROM "${validateName(tableName)}" ${wheresql}`;
@@ -74,14 +74,14 @@ const findOne = async (client, tableName, where) => {
   return get(client, sql, params);
 };
 
-const insertOne = async (client, tableName, row) => {
+const insertOne = (client, tableName, row) => {
   const { sql: valuessql, params } = valuesSql(row);
 
   const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;
   return run(client, sql, params);
 };
 
-const updateOne = async (client, tableName, where, updates) => {
+const updateOne = (client, tableName, where, updates) => {
   const { sql: wheresql, params: whereParams } = whereSql(where);
   const { sql: setsql, params: setParams } = setSql(updates);
 
@@ -92,6 +92,16 @@ const updateOne = async (client, tableName, where, updates) => {
 
   return run(client, sql, [...setParams, ...whereParams]);
 };
+
+// const updateMany = (client, tableName, wheres, updates) => {
+//   const foo = client.transaction(() => {
+//     updates.forEach((update, index) => {
+//       updateOne(client, tableName, wheres[index], update)
+//     });
+//   });
+
+//   console.log(foo)
+// };
 
 module.exports = {
   closeDB,
@@ -107,4 +117,5 @@ module.exports = {
   insertOne,
   toDB,
   updateOne,
+  // updateMany,
 };
