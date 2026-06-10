@@ -48,6 +48,8 @@ const deleteOne = async (client, tableName, where) => {
   return run(client, sql, params);
 };
 
+const dropTable = async (client, tableName) => run(client, `DROP TABLE "${validateName(tableName)}"`);
+
 const find = async (client, tableName, where, { limit = -1, offset = -1 }) => {
   const { params, sql: wheresql } = whereSql(where);
 
@@ -91,20 +93,6 @@ const updateOne = async (client, tableName, where, updates) => {
   return run(client, sql, [...setParams, ...whereParams]);
 };
 
-// TODO: deprecate
-const replaceOne = async (client, tableName, where, newRow) => {
-  const allColums = await all(
-    client,
-    `SELECT name FROM PRAGMA_TABLE_INFO('${validateName(tableName)}')`,
-  );
-  const defaults = allColums.reduce((acc, { name }) => ({ ...acc, [name]: null }), {});
-  const updates = { ...defaults, ...newRow };
-
-  return updateOne(client, tableName, where, updates);
-};
-
-const dropTable = async (client, tableName) => run(client, `DROP TABLE "${validateName(tableName)}"`);
-
 module.exports = {
   closeDB,
   connectDB,
@@ -117,7 +105,6 @@ module.exports = {
   findOne,
   fromDB,
   insertOne,
-  replaceOne,
   toDB,
   updateOne,
 };

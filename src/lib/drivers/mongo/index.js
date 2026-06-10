@@ -46,11 +46,6 @@ const insertOne = async (client, collection, doc) => client
   .collection(collection)
   .insertOne(copyDoc(doc));
 
-const replaceOne = (client, collection, filter, replacement) => client
-  .db()
-  .collection(collection)
-  .replaceOne(copyDoc(filter), copyDoc(replacement));
-
 const deleteOne = (client, collection, filter) => client
   .db()
   .collection(collection)
@@ -99,7 +94,6 @@ module.exports = {
   findOne,
   fromDB: (row) => row,
   insertOne,
-  replaceOne,
   toDB: (obj) => obj,
   updateOne,
   // upsert,

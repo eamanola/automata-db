@@ -19,7 +19,6 @@ describe('API', () => {
     expect(typeof client.db().collection('collection').insertOne).toBe('function');
     expect(typeof client.db().collection('collection').countDocuments).toBe('function');
     expect(typeof client.db().collection('collection').findOne).toBe('function');
-    expect(typeof client.db().collection('collection').replaceOne).toBe('function');
     expect(typeof client.db().collection('collection').deleteOne).toBe('function');
     expect(typeof client.db().collection('collection').find).toBe('function');
     expect(typeof client.db().collection('collection').updateOne).toBe('function');

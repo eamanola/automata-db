@@ -233,50 +233,6 @@ const { drivers } = require('.');
       });
     });
 
-    describe('replaceOne', () => {
-      it('should replace one item', async () => {
-        const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-
-        await db.replaceOne(tableName, entry, { foo: 2 });
-
-        expect(await db.findOne(tableName, { foo: 1 })).toBeFalsy();
-        expect(await db.findOne(tableName, { foo: 2 })).toBeTruthy();
-
-        expect(await db.count(tableName)).toBe(1);
-      });
-
-      it('should not partially update an entry', async () => {
-        const entry = { bar: 1, baz: 1 };
-        await db.insertOne(tableName, entry);
-
-        await db.replaceOne(tableName, entry, { bar: 2 });
-
-        const inserted = await db.findOne(tableName, { bar: 2 });
-        expect(inserted.bar).toBe(2);
-        expect(inserted.baz).toBeFalsy();
-      });
-
-      it('should not replace multiple items', async () => {
-        const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
-
-        await db.replaceOne(tableName, entry, { foo: 2 });
-
-        expect(await db.count(tableName, { foo: 1 })).toBe(1);
-        expect(await db.count(tableName, { foo: 2 })).toBe(1);
-      });
-
-      it('should not upsert', async () => {
-        const nonExisting = { baz: 2 };
-        const newRow = { bar: 2 };
-        await db.replaceOne(tableName, nonExisting, newRow);
-
-        expect(await db.findOne(tableName, newRow)).toBeFalsy();
-      });
-    });
-
     describe('updateOne', () => {
       it('should update one item', async () => {
         const entry = { bar: 1, foo: 1 };

@@ -44,10 +44,6 @@ module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
     findOne: async (tableName, where) => driver.findOne(this.client, tableName, where),
     fromDB: (row, columns) => driver.fromDB(row, columns),
     insertOne: async (tableName, row) => driver.insertOne(this.client, tableName, row),
-    // TODO deprecate, use update instead;
-    replaceOne: async (tableName, where, newRow) => (
-      driver.replaceOne(this.client, tableName, where, newRow)
-    ),
     state: null,
     toDB: (obj) => driver.toDB(obj),
     updateOne: async (tableName, where, updates, options = {}) => (

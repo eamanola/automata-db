@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
