@@ -93,15 +93,15 @@ const updateOne = (client, tableName, where, updates) => {
   return run(client, sql, [...setParams, ...whereParams]);
 };
 
-// const updateMany = (client, tableName, wheres, updates) => {
-//   const foo = client.transaction(() => {
-//     updates.forEach((update, index) => {
-//       updateOne(client, tableName, wheres[index], update)
-//     });
-//   });
+const update = (client, tableName, wheres, updates) => {
+  const exec = client.transaction(() => {
+    for (let i = 0; i < wheres.length; i += 1) {
+      updateOne(client, tableName, wheres[i], updates[i]);
+    }
+  });
 
-//   console.log(foo)
-// };
+  return exec();
+};
 
 module.exports = {
   closeDB,
@@ -116,6 +116,6 @@ module.exports = {
   fromDB,
   insertOne,
   toDB,
+  update,
   updateOne,
-  // updateMany,
 };

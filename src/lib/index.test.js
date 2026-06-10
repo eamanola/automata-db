@@ -274,40 +274,23 @@ const { drivers } = require('.');
         expect(await db.findOne(tableName, newRow)).toBeFalsy();
       });
     });
+
+    describe('update many', () => {
+      it('it should update many', async () => {
+        const entry1 = { bar: 1, foo: 1 };
+        const entry2 = { bar: 2, foo: 2 };
+
+        await db.insertOne(tableName, entry1);
+        await db.insertOne(tableName, entry2);
+
+        await db.update(tableName, [entry1, entry2], [{ foo: 11 }, { foo: 22 }]);
+
+        const inserted1 = await db.findOne(tableName, { bar: 1 });
+        const inserted2 = await db.findOne(tableName, { bar: 2 });
+
+        expect(inserted1.foo).toBe(11);
+        expect(inserted2.foo).toBe(22);
+      });
+    });
   });
 });
-
-// describe('update mant', () => {
-//   it('it should update or create many', async () => {
-//     const { client } = await connectDB(':memory:');
-//     await createTable(client, table);
-//     await deleteAll(client, table.name);
-//     expect(await count(client, table.name)).toBe(0);
-
-//     const obj1 = { foo: '1' };
-//     const obj2 = { foo: '2' };
-//     await insertOne(client, table.name, obj1);
-//     await insertOne(client, table.name, obj2);
-//     expect(await count(client, table.name)).toBe(2);
-
-//     const update1 = { ...obj1, foo: '11' };
-//     const update2 = { ...obj1, foo: '22' };
-
-//     await updateMany(
-//       client,
-//       table.name,
-//       [obj1, obj2],
-//       [update1, update2],
-//     );
-//     expect(await count(client, table.name)).toBe(2);
-
-//     const inDB1 = await findOne(client, table.name, update1);
-//     const inDB2 = await findOne(client, table.name, update2);
-
-//     console.log(update1, inDB1);
-//     console.log(update2, inDB2);
-
-//     await dropTable(client, table.name);
-//     await closeDB(client);
-//   });
-// });

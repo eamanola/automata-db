@@ -63,6 +63,26 @@ const updateOne = (client, collection, filter, updates, options) => client
   .collection(collection)
   .updateOne(copyDoc(filter), { $set: updates }, options);
 
+const update = (client, collection, filters, updates, options) => (
+  Promise.all(
+    filters.map((filter, index) => updateOne(client, collection, filter, updates[index], options)),
+  )
+);
+
+// needs replicas
+// const session = await client.startSession();
+// try {
+//   await session.withTransaction(async () => {
+//     for (let i = 0; i < filters.length; i += 1) {
+//       await updateOne(client, collection, filters[i], updates[i], { ...options, session });
+//     }
+//   });
+// } catch (err) {
+//   console.log(err);
+// } finally {
+//   await session.endSession();
+// }
+
 // const upsert = (collection, filter, updates) => (
 //  updateOne(collection, filter, updates, { upsert: true })
 // );
@@ -95,6 +115,6 @@ module.exports = {
   fromDB: (row) => row,
   insertOne,
   toDB: (obj) => obj,
+  update,
   updateOne,
-  // upsert,
 };
