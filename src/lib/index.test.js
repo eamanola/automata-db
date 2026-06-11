@@ -229,16 +229,18 @@ const { drivers } = require('.');
         const inserted2 = await db.findOne(tableName, entry2);
         expect(inserted2).toEqual(expect.objectContaining(entry2));
       });
-      if (DB_ENGINE === 'sqlite') {
-        it('should throw if objects not identical', async () => {
-          try {
-            await db.insert(tableName, [{ foo: 1 }, { bar: 2 }]);
-            expect(true).toBe(false);
-          } catch (err) {
-            expect(err).toBeTruthy();
-          }
-        });
-      }
+
+      it('should insert different valid objects if objects not identical', async () => {
+        const entries = [{ foo: 1 }, { bar: 2 }];
+        await db.insert(tableName, entries);
+        expect(await db.count(tableName)).toBe(2);
+
+        const inserted1 = await db.findOne(tableName, entries[0]);
+        expect(inserted1).toEqual(expect.objectContaining(entries[0]));
+
+        const inserted2 = await db.findOne(tableName, entries[1]);
+        expect(inserted2).toEqual(expect.objectContaining(entries[1]));
+      });
     });
 
     describe('insertOne', () => {

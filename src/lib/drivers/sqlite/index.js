@@ -67,19 +67,18 @@ const findOne = (client, tableName, where) => {
 };
 
 const insert = (client, tableName, rows) => {
-  const keysStr = JSON.stringify(Object.keys(rows[0]).sort());
-  if (rows.some((row) => JSON.stringify(Object.keys(row).sort()) !== keysStr)) {
-    throw new Error(
-      `Not implemented error:
-rows must have identical keys. Use several calls, for different types of objects`,
-    );
-  }
+  const exec = client.transaction(() => {
+    const columns = all(client, `PRAGMA table_info("${validateName(tableName)}");`)
+      .map(({ name }) => name);
 
-  const { sql: valuessql, params } = valuesSql(rows);
+    const { sql: valuessql, params } = valuesSql(columns, rows);
 
-  const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;
+    const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;
 
-  return run(client, sql, params);
+    return run(client, sql, params);
+  });
+
+  return exec();
 };
 
 const insertOne = (client, tableName, row) => insert(client, tableName, [row]);

@@ -71,23 +71,16 @@ const whereSql = (where) => {
   return { params, sql };
 };
 
-const valuesSql = (rows) => {
-  const isArray = Array.isArray(rows);
-  const row = isArray ? rows[0] : rows;
-  const keys = Object.keys(row);
-  if (keys.length === 0) {
-    return { params: [], sql: '' };
-  }
+const valuesSql = (columns, rows) => {
+  const data = Array.isArray(rows) ? rows : [rows];
 
-  const data = isArray ? rows : [rows];
+  const sql = `(${columns.join(', ')}) VALUES ${
+    data.map(() => `(${columns.map(() => '?').join(', ')})`).join(', ')}`;
 
-  const sql = `(${
-    keys.map((key) => validateName(key)).join(', ')
-  }) VALUES ${data.map(() => `(${
-    keys.map(() => '?').join(', ')
-  })`).join(', ')}`;
-
-  const params = data.reduce((final, aRow) => [...final, ...Object.values(aRow)], []);
+  const params = data.reduce((final, row) => [
+    ...final,
+    ...columns.map((key) => row[key]),
+  ], []);
 
   return { params, sql };
 };
@@ -96,7 +89,7 @@ const setSql = (updates) => {
   const params = Object.values(updates);
 
   const sql = params.length
-    ? `SET ${Object.keys(updates).map((key) => `${validateName(key)} = ? `).join(', ')}`
+    ? `SET ${Object.keys(updates).map((key) => `${validateName(key)} = ?`).join(', ')}`
     : '';
 
   return { params, sql };
