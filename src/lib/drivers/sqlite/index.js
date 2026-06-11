@@ -75,6 +75,14 @@ const findOne = (client, tableName, where) => {
 };
 
 const insert = (client, tableName, rows) => {
+  const keysStr = JSON.stringify(Object.keys(rows[0]).sort());
+  if (rows.some((aRow) => JSON.stringify(Object.keys(aRow).sort()) !== keysStr)) {
+    throw new Error(
+      `Not implemented error:
+rows must have identical keys. Use several calls, for different types of objects`,
+    );
+  }
+
   const { sql: valuessql, params } = valuesSql(rows);
 
   const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;

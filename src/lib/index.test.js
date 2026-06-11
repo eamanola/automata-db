@@ -29,8 +29,7 @@ const { drivers } = require('.');
     describe('count', () => {
       it('should count all by default', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         expect(await db.count(tableName)).toBe(3);
@@ -38,8 +37,7 @@ const { drivers } = require('.');
 
       it('should filter according to where', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         expect(await db.count(tableName, entry)).toBe(2);
@@ -49,8 +47,7 @@ const { drivers } = require('.');
     describe('deleteAll', () => {
       it('should delete all by default', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         await db.deleteAll(tableName);
@@ -60,8 +57,7 @@ const { drivers } = require('.');
 
       it('should filter according to where', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         await db.deleteAll(tableName, entry);
@@ -74,8 +70,7 @@ const { drivers } = require('.');
     describe('deleteOne', () => {
       it('should delete one', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         await db.deleteOne(tableName);
 
@@ -84,8 +79,7 @@ const { drivers } = require('.');
 
       it('should filter according to where', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         await db.deleteOne(tableName, { bar: 1 });
@@ -96,8 +90,7 @@ const { drivers } = require('.');
 
       it('should not delete multiple items', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         await db.deleteOne(tableName, entry);
 
@@ -106,8 +99,7 @@ const { drivers } = require('.');
 
       it('should delete one without where', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         await db.deleteOne(tableName);
 
@@ -118,8 +110,7 @@ const { drivers } = require('.');
     describe('find', () => {
       it('should find all by default', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         const entries = await db.find(tableName);
@@ -129,8 +120,7 @@ const { drivers } = require('.');
 
       it('should filter according to where', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
         await db.insertOne(tableName, { bar: 1 });
 
         const entries = await db.find(tableName, entry);
@@ -144,9 +134,7 @@ const { drivers } = require('.');
       describe('optional params', () => {
         it('should accept optional limit', async () => {
           const entry = { foo: 1 };
-          await db.insertOne(tableName, entry);
-          await db.insertOne(tableName, entry);
-          await db.insertOne(tableName, entry);
+          await db.insert(tableName, [entry, entry, entry]);
 
           const entries = await db.find(tableName, entry, { limit: 2 });
 
@@ -155,9 +143,11 @@ const { drivers } = require('.');
 
         it('should accept optional offset', async () => {
           const entry = { foo: 1 };
-          await db.insertOne(tableName, { ...entry, bar: 1 });
-          await db.insertOne(tableName, { ...entry, bar: 2 });
-          await db.insertOne(tableName, { ...entry, bar: 3 });
+          await db.insert(tableName, [
+            { ...entry, bar: 1 },
+            { ...entry, bar: 2 },
+            { ...entry, bar: 3 },
+          ]);
 
           const entries = await db.find(tableName, entry, { offset: 2 });
 
@@ -167,9 +157,11 @@ const { drivers } = require('.');
 
         it('and a combo of', async () => {
           const entry = { foo: 1 };
-          await db.insertOne(tableName, { ...entry, bar: 1 });
-          await db.insertOne(tableName, { ...entry, bar: 2 });
-          await db.insertOne(tableName, { ...entry, bar: 3 });
+          await db.insert(tableName, [
+            { ...entry, bar: 1 },
+            { ...entry, bar: 2 },
+            { ...entry, bar: 3 },
+          ]);
 
           const entries = await db.find(tableName, entry, { limit: 1, offset: 1 });
 
@@ -179,9 +171,11 @@ const { drivers } = require('.');
 
         it('should ignore limit and offset, if invalid', async () => {
           const entry = { foo: 1 };
-          await db.insertOne(tableName, { ...entry, bar: 1 });
-          await db.insertOne(tableName, { ...entry, bar: 2 });
-          await db.insertOne(tableName, { ...entry, bar: 3 });
+          await db.insert(tableName, [
+            { ...entry, bar: 1 },
+            { ...entry, bar: 2 },
+            { ...entry, bar: 3 },
+          ]);
 
           expect((await db.find(tableName, entry, { limit: 'foo' })).length).toBe(3);
           expect((await db.find(tableName, entry, { offset: 'foo' })).length).toBe(3);
@@ -211,8 +205,7 @@ const { drivers } = require('.');
 
       it('should not return multiple items', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         const result = await db.findOne(tableName, entry);
         expect(result).toEqual(expect.objectContaining(entry));
@@ -236,6 +229,16 @@ const { drivers } = require('.');
         const inserted2 = await db.findOne(tableName, entry2);
         expect(inserted2).toEqual(expect.objectContaining(entry2));
       });
+      if (DB_ENGINE === 'sqlite') {
+        it('should throw if objects not identical', async () => {
+          try {
+            await db.insert(tableName, [{ foo: 1 }, { bar: 2 }]);
+            expect(true).toBe(false);
+          } catch (err) {
+            expect(err).toBeTruthy();
+          }
+        });
+      }
     });
 
     describe('insertOne', () => {
@@ -265,8 +268,7 @@ const { drivers } = require('.');
 
       it('should not update multiple items', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         await db.updateOne(tableName, entry, { foo: 2 });
 
@@ -298,9 +300,7 @@ const { drivers } = require('.');
       it('it should update many', async () => {
         const entry1 = { bar: 1, foo: 1 };
         const entry2 = { bar: 2, foo: 2 };
-
-        await db.insertOne(tableName, entry1);
-        await db.insertOne(tableName, entry2);
+        await db.insert(tableName, [entry1, entry2]);
 
         await db.update(tableName, [entry1, entry2], [{ foo: 11 }, { foo: 22 }]);
 
