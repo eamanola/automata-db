@@ -55,15 +55,7 @@ const find = (client, tableName, where, { limit = -1, offset = -1 }) => {
 
   const sql = `SELECT * FROM "${validateName(tableName)}" ${wheresql} LIMIT ? OFFSET ?`;
 
-  return all(
-    client,
-    sql,
-    [
-      ...params,
-      limit,
-      offset,
-    ],
-  );
+  return all(client, sql, [...params, limit, offset]);
 };
 
 const findOne = (client, tableName, where) => {
@@ -76,7 +68,7 @@ const findOne = (client, tableName, where) => {
 
 const insert = (client, tableName, rows) => {
   const keysStr = JSON.stringify(Object.keys(rows[0]).sort());
-  if (rows.some((aRow) => JSON.stringify(Object.keys(aRow).sort()) !== keysStr)) {
+  if (rows.some((row) => JSON.stringify(Object.keys(row).sort()) !== keysStr)) {
     throw new Error(
       `Not implemented error:
 rows must have identical keys. Use several calls, for different types of objects`,
