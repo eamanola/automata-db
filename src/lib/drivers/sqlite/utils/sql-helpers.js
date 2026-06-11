@@ -71,12 +71,23 @@ const whereSql = (where) => {
   return { params, sql };
 };
 
-const valuesSql = (row) => {
-  const params = Object.values(row);
+const valuesSql = (rows) => {
+  const isArray = Array.isArray(rows);
+  const row = isArray ? rows[0] : rows;
+  const keys = Object.keys(row);
+  if (keys.length === 0) {
+    return { params: [], sql: '' };
+  }
 
-  const sql = params.length
-    ? `(${Object.keys(row).map((key) => validateName(key)).join(', ')}) VALUES (${params.map(() => '?').join(', ')})`
-    : '';
+  const data = isArray ? rows : [rows];
+
+  const sql = `(${
+    keys.map((key) => validateName(key)).join(', ')
+  }) VALUES ${data.map(() => `(${
+    keys.map(() => '?').join(', ')
+  })`).join(', ')}`;
+
+  const params = data.reduce((final, aRow) => [...final, ...Object.values(aRow)], []);
 
   return { params, sql };
 };

@@ -219,6 +219,25 @@ const { drivers } = require('.');
       });
     });
 
+    describe('insert', () => {
+      it('should save the new entries', async () => {
+        const entry1 = { foo: 1 };
+        const entry2 = { foo: 2 };
+
+        expect(await db.count(tableName)).toBe(0);
+
+        await db.insert(tableName, [entry1, entry2]);
+
+        expect(await db.count(tableName)).toBe(2);
+
+        const inserted1 = await db.findOne(tableName, entry1);
+        expect(inserted1).toEqual(expect.objectContaining(entry1));
+
+        const inserted2 = await db.findOne(tableName, entry2);
+        expect(inserted2).toEqual(expect.objectContaining(entry2));
+      });
+    });
+
     describe('insertOne', () => {
       it('should save the new entry', async () => {
         const entry = { foo: 1 };

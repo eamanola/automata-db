@@ -43,6 +43,7 @@ module.exports = ({ DB_ENGINE = 'sqlite' } = {}) => {
     ),
     findOne: async (tableName, where) => driver.findOne(this.client, tableName, where),
     fromDB: (row, columns) => driver.fromDB(row, columns),
+    insert: async (tableName, rows) => driver.insert(this.client, tableName, rows),
     insertOne: async (tableName, row) => driver.insertOne(this.client, tableName, row),
     state: null,
     toDB: (obj) => driver.toDB(obj),

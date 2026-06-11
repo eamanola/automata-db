@@ -74,12 +74,15 @@ const findOne = (client, tableName, where) => {
   return get(client, sql, params);
 };
 
-const insertOne = (client, tableName, row) => {
-  const { sql: valuessql, params } = valuesSql(row);
+const insert = (client, tableName, rows) => {
+  const { sql: valuessql, params } = valuesSql(rows);
 
   const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;
+
   return run(client, sql, params);
 };
+
+const insertOne = (client, tableName, row) => insert(client, tableName, [row]);
 
 const updateOne = (client, tableName, where, updates) => {
   const { sql: wheresql, params: whereParams } = whereSql(where);
@@ -114,6 +117,7 @@ module.exports = {
   find,
   findOne,
   fromDB,
+  insert,
   insertOne,
   toDB,
   update,

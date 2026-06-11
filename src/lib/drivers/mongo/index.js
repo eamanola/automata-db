@@ -41,6 +41,11 @@ const findOne = async (client, collection, filter) => removeMongoId(
     .findOne(copyDoc(filter)),
 );
 
+const insert = (client, collection, docs) => client
+  .db()
+  .collection(collection)
+  .insertMany(docs.map((doc) => copyDoc(doc)));
+
 const insertOne = async (client, collection, doc) => client
   .db()
   .collection(collection)
@@ -113,6 +118,7 @@ module.exports = {
   find,
   findOne,
   fromDB: (row) => row,
+  insert,
   insertOne,
   toDB: (obj) => obj,
   update,
