@@ -114,8 +114,6 @@ describe('indexes', () => {
     expect(results.some(({ name, unique }) => name === index.name && !unique)).toBe(true);
     expect(results.some(({ name, unique }) => name === indexUnique.name && unique)).toBe(true);
 
-    indexes.map(({ name }) => dropIndex(client, name));
-    expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
     await dropTable(client, table.name);
     await closeDB(client);
   });
@@ -138,8 +136,44 @@ describe('indexes', () => {
     expect(results.length).toBe(indexes.length);
     expect(results.some(({ name }) => name === indexes[0].name)).toBe(true);
 
-    indexes.map(({ name }) => dropIndex(client, name));
     await dropTable(client, table.name);
     await closeDB(client);
+  });
+
+  describe('drop index', () => {
+    it('should drop indexes', async () => {
+      const { client } = await connectDB(':memory:');
+
+      const indexes = [{ columns: [table.columns[0].name], name: 'idx-foo' }];
+
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+      await createTable(client, { ...table, indexes });
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(1);
+
+      dropIndex(client, indexes[0].name);
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+      dropTable(client, table.name);
+      await closeDB(client);
+    });
+  });
+
+  describe('drop table', () => {
+    it('should clean indexes', async () => {
+      const { client } = await connectDB(':memory:');
+
+      const indexes = [{ columns: [table.columns[0].name], name: 'idx-foo' }];
+
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+      await createTable(client, { ...table, indexes });
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(1);
+
+      dropTable(client, table.name);
+      expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+      await closeDB(client);
+    });
   });
 });
