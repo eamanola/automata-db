@@ -138,6 +138,7 @@ describe('indexes', () => {
     expect(results.length).toBe(indexes.length);
     expect(results.some(({ name }) => name === indexes[0].name)).toBe(true);
 
+    await client.prepare(`DROP INDEX '${indexes[0].name}'`).run();
     await dropTable(client, table.name);
     await closeDB(client);
   });
