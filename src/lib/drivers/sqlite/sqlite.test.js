@@ -84,3 +84,61 @@ describe('lastID', () => {
     await closeDB(client);
   });
 });
+
+describe('indexes', () => {
+  // sql: `SELECT * FROM sqlite_master WHERE type = 'index'`,
+  // PRAGMA INDEX_LIST('${table.name}')
+  it('should create unique/not', async () => {
+    const { client } = await connectDB(':memory:');
+
+    const index = {
+      columns: [table.columns[0].name],
+      name: `idx-${table.name}-${table.columns[0].name}`,
+      unique: false,
+    };
+    const indexUnique = {
+      columns: [table.columns[0].name],
+      name: `idx-${table.name}-${table.columns[0].name}2`,
+      unique: true,
+    };
+    const indexes = [index, indexUnique];
+
+    expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+    await createTable(client, { ...table, indexes });
+
+    const results = client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all();
+
+    expect(results.length).toBe(2);
+    expect(results.some(({ name, unique }) => name === index.name && !unique)).toBe(true);
+    expect(results.some(({ name, unique }) => name === indexUnique.name && unique)).toBe(true);
+
+    await client.prepare(`DROP INDEX '${index.name}'`).run();
+    await client.prepare(`DROP INDEX '${indexUnique.name}'`).run();
+    await dropTable(client, table.name);
+    await closeDB(client);
+  });
+  it('should create on several columns', async () => {
+    const { client } = await connectDB(':memory:');
+
+    const col1 = { name: 'foo', type: 'string' };
+    const col2 = { name: 'bar', type: 'string' };
+    const columns = [col1, col2];
+
+    const indexes = [{
+      columns: columns.map(({ name }) => name),
+      name: `idx-${table.name}-${columns.map(({ name }) => name).join('-')}`,
+    }];
+
+    expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
+
+    await createTable(client, { ...table, columns, indexes });
+
+    const results = client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all();
+    expect(results.length).toBe(indexes.length);
+    expect(results.some(({ name }) => name === indexes[0].name)).toBe(true);
+
+    await dropTable(client, table.name);
+    await closeDB(client);
+  });
+});

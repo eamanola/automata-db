@@ -1,81 +1,81 @@
 const { fromDB, toDB } = require('./utils/type-conversion');
-const {
-  createIndexSql, createSql, setSql, valuesSql, whereSql,
-} = require('./utils/sql-helpers');
-const {
-  all, closeDB, connectDB, get, run,
-} = require('./driver');
+const { createIndexSql, createSql, statement } = require('./utils/sql-helpers');
+const { closeDB, connectDB } = require('./driver');
 const validateName = require('./utils/valid-name');
 
 const count = (client, tableName, where = {}) => {
-  const { sql: wheresql, params } = whereSql(where);
-
-  const sql = `SELECT count(*) AS count FROM "${validateName(tableName)}" ${wheresql}`;
-
-  const { count: cc } = get(client, sql, params);
+  const { count: cc } = statement(client)
+    .select('count(*)')
+    .as('count')
+    .from(tableName)
+    .where(where)
+    .get();
 
   return cc;
 };
 
-const createIndexes = (client, { indexes = [], name: tableName }) => Promise.all(
-  indexes.map((index) => run(client, createIndexSql(tableName, index))),
-);
-
 const createTable = (client, table) => {
-  run(client, createSql(table));
-  createIndexes(client, table);
+  const exec = client.transaction(() => {
+    statement(client, { sql: createSql(table) }).run();
 
-  // const indexes = all('SELECT name, tbl_name FROM sqlite_master WHERE type = "index";');
-  // console.log(indexes);
+    table.indexes?.forEach(
+      (index) => { statement(client, { sql: createIndexSql(table.name, index) }).run(); },
+    );
+  });
+
+  return exec();
 };
 
-const deleteAll = (client, tableName, where = {}) => {
-  const { sql: wheresql, params } = whereSql(where);
+const deleteAll = (client, tableName, where = {}) => statement(client)
+  .delete()
+  .from(tableName)
+  .where(where)
+  .run();
 
-  const sql = `DELETE FROM "${validateName(tableName)}" ${wheresql}`;
+const deleteOne = (client, tableName, where = {}) => {
+  const rowIdStment = Object.keys(where).length > 0
+    ? statement()
+      .select('rowid')
+      .from(tableName)
+      .where(where)
+      .limit(1)
+    : null;
 
-  return run(client, sql, params);
+  statement(client)
+    .delete()
+    .from(tableName)
+    .where(rowIdStment ? { rowId: rowIdStment } : {})
+    .limit(1)
+    .run();
 };
 
-const deleteOne = (client, tableName, where) => {
-  const { sql: wheresql, params } = whereSql(where);
+const dropTable = (client, tableName) => statement(client)
+  .drop(tableName)
+  .run();
 
-  const sql = `
-  DELETE FROM "${validateName(tableName)}" WHERE rowid = (
-    SELECT rowid FROM "${validateName(tableName)}" ${wheresql} LIMIT 1
-  )`;
+const find = (client, tableName, where, { limit = -1, offset = -1 }) => statement(client)
+  .select('*')
+  .from(tableName)
+  .where(where)
+  .limit(limit)
+  .offset(offset)
+  .all();
 
-  return run(client, sql, params);
-};
-
-const dropTable = (client, tableName) => run(client, `DROP TABLE "${validateName(tableName)}"`);
-
-const find = (client, tableName, where, { limit = -1, offset = -1 }) => {
-  const { params, sql: wheresql } = whereSql(where);
-
-  const sql = `SELECT * FROM "${validateName(tableName)}" ${wheresql} LIMIT ? OFFSET ?`;
-
-  return all(client, sql, [...params, limit, offset]);
-};
-
-const findOne = (client, tableName, where) => {
-  const { params, sql: wheresql } = whereSql(where);
-
-  const sql = `SELECT * FROM "${validateName(tableName)}" ${wheresql}`;
-
-  return get(client, sql, params);
-};
+const findOne = (client, tableName, where) => statement(client)
+  .select('*')
+  .from(tableName)
+  .where(where)
+  .limit(1)
+  .get();
 
 const insert = (client, tableName, rows) => {
   const exec = client.transaction(() => {
-    const columns = all(client, `PRAGMA table_info("${validateName(tableName)}");`)
-      .map(({ name }) => name);
+    const columns = statement(client, { sql: `PRAGMA table_info("${validateName(tableName)}");` })
+      .all().map(({ name }) => name);
 
-    const { sql: valuessql, params } = valuesSql(columns, rows);
-
-    const sql = `INSERT INTO "${validateName(tableName)}" ${valuessql}`;
-
-    return run(client, sql, params);
+    return statement(client)
+      .insert(tableName, columns, rows)
+      .run();
   });
 
   return exec();
@@ -84,17 +84,23 @@ const insert = (client, tableName, rows) => {
 const insertOne = (client, tableName, row) => insert(client, tableName, [row]);
 
 const updateOne = (client, tableName, where, updates) => {
-  const { sql: wheresql, params: whereParams } = whereSql(where);
-  const { sql: setsql, params: setParams } = setSql(updates);
+  const rowIdStment = Object.keys(where).length > 0
+    ? statement()
+      .select('rowid')
+      .from(tableName)
+      .where(where)
+      .limit(1)
+    : null;
 
-  const sql = `
-  UPDATE "${validateName(tableName)}" ${setsql} WHERE rowid = (
-    SELECT rowid FROM "${validateName(tableName)}" ${wheresql} LIMIT 1
-  ) LIMIT 1`;
-
-  return run(client, sql, [...setParams, ...whereParams]);
+  statement(client)
+    .update(tableName)
+    .set(updates)
+    .where(rowIdStment ? { rowId: rowIdStment } : {})
+    .limit(1)
+    .run();
 };
 
+// prone to insert (many) buggy condition
 const update = (client, tableName, wheres, updates) => {
   const exec = client.transaction(() => {
     for (let i = 0; i < wheres.length; i += 1) {

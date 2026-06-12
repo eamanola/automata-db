@@ -92,6 +92,8 @@ const update = (client, collection, filters, updates, options) => (
 //  updateOne(collection, filter, updates, { upsert: true })
 // );
 
+// https://stackoverflow.com/questions/2350495/how-do-i-perform-the-sql-join-equivalent-in-mongodb
+
 const deleteAll = (client, collection, filter) => client
   .db()
   .collection(collection)

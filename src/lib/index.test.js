@@ -78,11 +78,11 @@ const { drivers } = require('.');
       });
 
       it('should filter according to where', async () => {
-        const entry = { foo: 1 };
+        const entry = { foo: 12 };
         await db.insert(tableName, [entry, entry]);
-        await db.insertOne(tableName, { bar: 1 });
+        await db.insertOne(tableName, { bar: 13, foo: 12 });
 
-        await db.deleteOne(tableName, { bar: 1 });
+        await db.deleteOne(tableName, { bar: 13, foo: 12 });
 
         expect(await db.count(tableName, entry)).toBe(2);
         expect(await db.count(tableName, { bar: 1 })).toBe(0);
@@ -192,7 +192,7 @@ const { drivers } = require('.');
     describe('findOne', () => {
       it('should find one item', async () => {
         const entry = { foo: 1 };
-        await db.insertOne(tableName, entry);
+        await db.insert(tableName, [entry, entry]);
 
         const result = await db.findOne(tableName, entry);
         expect(result).toEqual(expect.objectContaining(entry));
@@ -214,8 +214,8 @@ const { drivers } = require('.');
 
     describe('insert', () => {
       it('should save the new entries', async () => {
-        const entry1 = { foo: 1 };
-        const entry2 = { foo: 2 };
+        const entry1 = { foo: 13 };
+        const entry2 = { foo: 12 };
 
         expect(await db.count(tableName)).toBe(0);
 
