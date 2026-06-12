@@ -49,6 +49,10 @@ const deleteOne = (client, tableName, where = {}) => {
     .run();
 };
 
+const dropIndex = (client, indexName) => statement(client)
+  .drop(indexName, { type: 'INDEX' })
+  .run();
+
 const dropTable = (client, tableName) => statement(client)
   .drop(tableName)
   .run();
@@ -118,6 +122,7 @@ module.exports = {
   createTable,
   deleteAll,
   deleteOne,
+  dropIndex,
   dropTable,
   find,
   findOne,

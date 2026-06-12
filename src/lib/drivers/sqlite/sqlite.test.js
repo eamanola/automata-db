@@ -8,6 +8,7 @@ const {
   insertOne,
   deleteAll,
   count,
+  dropIndex,
   dropTable,
 } = require('.');
 
@@ -113,17 +114,16 @@ describe('indexes', () => {
     expect(results.some(({ name, unique }) => name === index.name && !unique)).toBe(true);
     expect(results.some(({ name, unique }) => name === indexUnique.name && unique)).toBe(true);
 
-    await client.prepare(`DROP INDEX '${index.name}'`).run();
-    await client.prepare(`DROP INDEX '${indexUnique.name}'`).run();
+    indexes.map(({ name }) => dropIndex(client, name));
+    expect(client.prepare(`PRAGMA INDEX_LIST('${table.name}')`).all().length).toBe(0);
     await dropTable(client, table.name);
     await closeDB(client);
   });
+
   it('should create on several columns', async () => {
     const { client } = await connectDB(':memory:');
 
-    const col1 = { name: 'foo', type: 'string' };
-    const col2 = { name: 'bar', type: 'string' };
-    const columns = [col1, col2];
+    const columns = [{ name: 'foo', type: 'string' }, { name: 'bar', type: 'string' }];
 
     const indexes = [{
       columns: columns.map(({ name }) => name),
@@ -138,7 +138,7 @@ describe('indexes', () => {
     expect(results.length).toBe(indexes.length);
     expect(results.some(({ name }) => name === indexes[0].name)).toBe(true);
 
-    await client.prepare(`DROP INDEX '${indexes[0].name}'`).run();
+    indexes.map(({ name }) => dropIndex(client, name));
     await dropTable(client, table.name);
     await closeDB(client);
   });

@@ -151,8 +151,9 @@ const statement = (client = null, { params = [], sql = '' } = {}) => ({
 
     return statement(client, { params: p, sql: s });
   },
-  drop: (tableName) => {
-    const s = `${sql} DROP TABLE "${validateName(tableName)}"`;
+  // index or table name
+  drop: (name, { type = 'TABLE' } = {}) => {
+    const s = `${sql} DROP ${validateName(type)} "${validateName(name)}"`;
     const p = [...params];
 
     return statement(client, { params: p, sql: s });
