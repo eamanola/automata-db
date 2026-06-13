@@ -1,9 +1,9 @@
 const supportedTypes = [
-  'bool',
-  'date',
-  'number',
-  'object',
-  'string',
+  Boolean,
+  Date,
+  Number,
+  Object,
+  String,
 ];
 
 const skip = (obj) => [null/* , undefined */].includes(obj) || (typeof obj !== 'object');
@@ -21,24 +21,24 @@ const fromDB = (row, columns) => {
     } else {
       const { type } = columns.find(({ name }) => name === key);
       switch (type) {
-        case 'string':
-          value = String(row[key]);
-          break;
-
-        case 'number':
-          value = Number(row[key]);
-          break;
-
-        case 'bool':
+        case Boolean:
           value = Number(row[key]) === 1;
           break;
 
-        case 'date':
+        case Date:
           value = new Date(row[key]);
           break;
 
-        case 'object':
+        case Number:
+          value = Number(row[key]);
+          break;
+
+        case Object:
           value = JSON.parse(row[key]);
+          break;
+
+        case String:
+          value = String(row[key]);
           break;
 
         default:

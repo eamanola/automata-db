@@ -17,25 +17,29 @@ const yupFromTable = async ({ columns, name: tableName }) => {
       { name, required, type },
     ) => {
       let validator;
-
       switch (type) {
         case 'string':
+        case String:
           validator = string();
           break;
 
         case 'number':
+        case Number:
           validator = number();
           break;
 
         case 'bool':
+        case Boolean:
           validator = bool();
           break;
 
         case 'date':
+        case Date:
           validator = date();
           break;
 
         case 'object':
+        case Object:
           validator = object();
           break;
 

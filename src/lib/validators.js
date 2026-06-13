@@ -12,7 +12,18 @@ const columnSchema = object().shape({
   default: mixed(),
   name: string().required(),
   required: bool(),
-  type: mixed().oneOf(supportedSqliteTypes).required(),
+  type: mixed().oneOf(supportedSqliteTypes, () => {
+    const supportedTypes = supportedSqliteTypes.map((supportedSqliteType) => {
+      if (typeof supportedSqliteType === 'function') {
+        return supportedSqliteType.name;
+      }
+
+      // if (typeof supportedSqliteType === 'string')
+      return supportedSqliteType;
+    });
+
+    return `type must be one of: ${supportedTypes.join(', ')}`;
+  }).required(),
   unique: bool(),
 }).noUnknown().strict();
 

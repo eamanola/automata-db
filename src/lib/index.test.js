@@ -6,9 +6,9 @@ const { drivers } = require('.');
   const tableName = 'test';
 
   const columns = [
-    { name: 'foo', type: 'number' },
-    { name: 'bar', type: 'number' },
-    { default: 0, name: 'baz', type: 'number' },
+    { name: 'foo', type: Number },
+    { name: 'bar', type: Number },
+    { default: 0, name: 'baz', type: Number },
   ];
 
   const table = { columns, name: tableName };

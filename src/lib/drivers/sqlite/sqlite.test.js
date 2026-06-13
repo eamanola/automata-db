@@ -12,7 +12,7 @@ const {
   dropTable,
 } = require('.');
 
-const table = { columns: [{ name: 'foo', type: 'string' }], name: 'test-table' };
+const table = { columns: [{ name: 'foo', type: String }], name: 'test-table' };
 
 it('is valid table', async () => {
   await tableSchema.validate(table);
@@ -121,7 +121,7 @@ describe('indexes', () => {
   it('should create on several columns', async () => {
     const { client } = await connectDB(':memory:');
 
-    const columns = [{ name: 'foo', type: 'string' }, { name: 'bar', type: 'string' }];
+    const columns = [{ name: 'foo', type: String }, { name: 'bar', type: String }];
 
     const indexes = [{
       columns: columns.map(({ name }) => name),

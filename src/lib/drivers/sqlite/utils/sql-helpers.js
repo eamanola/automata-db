@@ -10,20 +10,20 @@ const { all, get, run } = require('../driver');
 const mapType = (type) => {
   let mapped;
   switch (type) {
-    case 'number':
+    case Number:
       mapped = 'REAL';
       break;
 
-    case 'string':
+    case String:
       mapped = 'TEXT';
       break;
 
-    case 'bool':
+    case Boolean:
       mapped = 'INTEGER';
       break;
 
-    case 'date':
-    case 'object':
+    case Date:
+    case Object:
       mapped = 'TEXT';
       break;
 

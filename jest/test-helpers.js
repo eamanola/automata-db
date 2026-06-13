@@ -1,11 +1,11 @@
 const validTableSchema = () => ({
   columns: [
-    { name: 'bool', type: 'bool' },
-    { name: 'date', type: 'date' },
-    { name: 'object', type: 'object' },
-    { name: 'number', type: 'number' },
-    { name: 'required', required: true, type: 'string' },
-    { name: 'string', type: 'string' },
+    { name: 'bool', type: Boolean },
+    { name: 'date', type: Date },
+    { name: 'object', type: Object },
+    { name: 'number', type: Number },
+    { name: 'required', required: true, type: String },
+    { name: 'string', type: String },
   ],
   indexes: [
     {
