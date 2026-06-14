@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
@@ -40,7 +40,6 @@
     "jest": "^30.4.2"
   },
   "dependencies": {
-    "dotenv": "^17.4.2",
     "yup": "^1.7.1"
   },
   "peerDependencies": {
