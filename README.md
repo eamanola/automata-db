@@ -1,3 +1,8 @@
 # automata-db
 
-database abstraction for automata
+Abstraction layer for database access
+
+## implemented databases
+
+- sqlite
+- mongo

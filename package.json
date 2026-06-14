@@ -1,6 +1,6 @@
 {
   "name": "automata-db",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "description": "db abstraction for automata",
   "main": "dist/index.bundle.js",
   "type": "commonjs",
@@ -21,7 +21,7 @@
     "abstraction"
   ],
   "author": "Ehsun Amanolahi",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "bump-pkg-json": "^0.1.3",
